@@ -9,7 +9,7 @@ import (
 func TestKleeneExpression(t *testing.T) {
 	ex, err := KleeneExpression(DayOfWeekContext, "*")
 	assert.NoError(t, err)
-	assert.Equal(t, Sequence{start: 1, stop: 7, step: 1}, ex)
+	assert.Equal(t, Sequence{start: 1, end: 7, step: 1}, ex)
 }
 
 func TestKleeneExpressionError(t *testing.T) {
@@ -23,7 +23,7 @@ func TestRangeExpression(t *testing.T) {
 		input    string
 		expected Enumerator
 	}{
-		{"normal", "1-10", Sequence{start: 1, stop: 10, step: 1}},
+		{"normal", "1-10", Sequence{start: 1, end: 10, step: 1}},
 		{"single", "25", IrregularSequence{entries: []int{25}}},
 	}
 
@@ -64,8 +64,8 @@ func TestRepeatExpression(t *testing.T) {
 		input    string
 		expected Enumerator
 	}{
-		{"star", "*/10", Sequence{start: 0, stop: 59, step: 10}},
-		{"normal", "5/10", Sequence{start: 5, stop: 59, step: 10}},
+		{"star", "*/10", Sequence{start: 0, end: 59, step: 10}},
+		{"normal", "5/10", Sequence{start: 5, end: 59, step: 10}},
 	}
 
 	for _, test := range cases {
@@ -143,11 +143,11 @@ func TestMultiExpression(t *testing.T) {
 		input    string
 		expected Enumerator
 	}{
-		{"star", "*", Sequence{start: 0, stop: 59, step: 1}},
-		{"range", "1-10", Sequence{start: 1, stop: 10, step: 1}},
+		{"star", "*", Sequence{start: 0, end: 59, step: 1}},
+		{"range", "1-10", Sequence{start: 1, end: 10, step: 1}},
 		{"range single", "25", IrregularSequence{entries: []int{25}}},
-		{"repeat", "5/10", Sequence{start: 5, stop: 59, step: 10}},
-		{"repeat star", "*/10", Sequence{start: 0, stop: 59, step: 10}},
+		{"repeat", "5/10", Sequence{start: 5, end: 59, step: 10}},
+		{"repeat star", "*/10", Sequence{start: 0, end: 59, step: 10}},
 		{"literal", "1,2,3", IrregularSequence{entries: []int{1, 2, 3}}},
 	}
 

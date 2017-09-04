@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// CronExpression describes a parsed cron expression.
 type CronExpression struct {
 	minutes    Enumerator
 	hours      Enumerator
@@ -16,6 +17,7 @@ type CronExpression struct {
 	command    string
 }
 
+// Parse parses a cron expression from a string.
 func Parse(input string) (*CronExpression, error) {
 	parts := strings.Split(input, " ")
 	if len(parts) < 6 {
@@ -44,22 +46,28 @@ func Parse(input string) (*CronExpression, error) {
 	}, nil
 }
 
+// Parser is anything that can parse an expression part.
 type Parser interface {
 	Parse(ExpressionContext, string) (Enumerator, error)
 }
 
+// ParseFunc allows us to adapt a func to Parser.
 type ParseFunc func(ExpressionContext, string) (Enumerator, error)
 
+// Parse adapts ParseFunc to parser.
 func (f ParseFunc) Parse(ex ExpressionContext, input string) (Enumerator, error) {
 	return f(ex, input)
 }
 
+// A MultiExpression detects the type of expression and hands off to another parser.
+// It uses regex to do this for simplicity rather than a traditional tokenizer.
 type MultiExpression struct {
 	rangeRegex   *regexp.Regexp
 	repeatRegex  *regexp.Regexp
 	literalRegex *regexp.Regexp
 }
 
+// Parse parses any expression by deferring to other parsers.
 func (m MultiExpression) Parse(ex ExpressionContext, input string) (Enumerator, error) {
 	trimmed := strings.TrimSpace(input)
 	if trimmed == "*" {
@@ -83,17 +91,19 @@ var multiExpression = MultiExpression{
 	literalRegex: regexp.MustCompile(`(\d+)(,\s*\d+)*`),
 }
 
+// KleeneExpression parses the "*" expression only.
 var KleeneExpression = ParseFunc(func(ex ExpressionContext, input string) (Enumerator, error) {
 	if input != "*" {
 		return nil, errors.New("input must be *")
 	}
 	return Sequence{
 		start: ex.Min(),
-		stop:  ex.Max(),
+		end:   ex.Max(),
 		step:  1,
 	}, nil
 })
 
+// RangeExpression parses expressions of the for x-y.
 var RangeExpression = ParseFunc(func(ex ExpressionContext, input string) (Enumerator, error) {
 	parts := strings.Split(input, "-")
 	if len(parts) > 2 {
@@ -119,11 +129,12 @@ var RangeExpression = ParseFunc(func(ex ExpressionContext, input string) (Enumer
 
 	return Sequence{
 		start: start,
-		stop:  end,
+		end:   end,
 		step:  1,
 	}, nil
 })
 
+// RepeatExpression parses expressions of the form x/y, including */y.
 var RepeatExpression = ParseFunc(func(ex ExpressionContext, input string) (Enumerator, error) {
 	parts := strings.Split(input, "/")
 	if len(parts) != 2 {
@@ -137,7 +148,7 @@ var RepeatExpression = ParseFunc(func(ex ExpressionContext, input string) (Enume
 	if parts[0] == "*" {
 		return Sequence{
 			start: ex.Min(),
-			stop:  ex.Max(),
+			end:   ex.Max(),
 			step:  end,
 		}, nil
 	}
@@ -149,11 +160,12 @@ var RepeatExpression = ParseFunc(func(ex ExpressionContext, input string) (Enume
 
 	return Sequence{
 		start: start,
-		stop:  ex.Max(),
+		end:   ex.Max(),
 		step:  end,
 	}, nil
 })
 
+// LiteralExpression parses expressions of the form "x,y[,z].."
 var LiteralExpression = ParseFunc(func(ex ExpressionContext, input string) (Enumerator, error) {
 	parts := strings.Split(input, ",")
 	times := make([]int, len(parts))

@@ -8,7 +8,7 @@ import (
 
 const tableColWidth = 14
 
-type Reporter interface {
+type reporter interface {
 	Report(*CronExpression, io.Writer)
 }
 
@@ -18,6 +18,7 @@ func (f reportFunc) Report(c *CronExpression, w io.Writer) {
 	f(c, w)
 }
 
+// TableReporter writes the CronExpression to the writer in tabular format.
 var TableReporter = reportFunc(func(c *CronExpression, w io.Writer) {
 	parts := []struct {
 		label string
