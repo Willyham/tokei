@@ -29,20 +29,40 @@ func (f ParseFunc) Parse(ex ExpressionContext, input string) (Enumerator, error)
 	return f(ex, input)
 }
 
+var KleeneExpression = ParseFunc(func(ex ExpressionContext, input string) (Enumerator, error) {
+	if input != "*" {
+		return nil, errors.New("input must be *")
+	}
+	return Sequence{
+		start: ex.Min(),
+		stop:  ex.Max(),
+		step:  1,
+	}, nil
+})
+
 var RangeExpression = ParseFunc(func(ex ExpressionContext, input string) (Enumerator, error) {
 	parts := strings.Split(input, "-")
-	if len(parts) < 2 {
+	if len(parts) > 2 {
 		return nil, errors.New("must be of form x-y")
 	}
-
 	start, err := parseStartValue(ex, parts[0])
 	if err != nil {
 		return nil, err
 	}
+
+	if len(parts) == 1 {
+		return NewIrregularSequence([]int{start}), nil
+	}
+
 	end, err := parseEndValue(ex, parts[1])
 	if err != nil {
 		return nil, err
 	}
+
+	if start > end {
+		return nil, errors.New("invalid range")
+	}
+
 	return Sequence{
 		start: start,
 		stop:  end,
@@ -52,18 +72,27 @@ var RangeExpression = ParseFunc(func(ex ExpressionContext, input string) (Enumer
 
 var RepeatExpression = ParseFunc(func(ex ExpressionContext, input string) (Enumerator, error) {
 	parts := strings.Split(input, "/")
-	if len(parts) < 2 {
+	if len(parts) != 2 {
 		return nil, errors.New("Invalid repeat expression, must be of form x/y")
+	}
+	end, err := parseEndValue(ex, parts[1])
+	if err != nil {
+		return nil, err
+	}
+
+	if parts[0] == "*" {
+		return Sequence{
+			start: ex.Min(),
+			stop:  ex.Max(),
+			step:  end,
+		}, nil
 	}
 
 	start, err := parseStartValue(ex, parts[0])
 	if err != nil {
 		return nil, err
 	}
-	end, err := parseEndValue(ex, parts[1])
-	if err != nil {
-		return nil, err
-	}
+
 	return Sequence{
 		start: start,
 		stop:  ex.Max(),
@@ -73,7 +102,7 @@ var RepeatExpression = ParseFunc(func(ex ExpressionContext, input string) (Enume
 
 var LiteralExpression = ParseFunc(func(ex ExpressionContext, input string) (Enumerator, error) {
 	parts := strings.Split(input, ",")
-	if len(parts) < 1 {
+	if len(parts) < 2 {
 		return nil, errors.New("must be of form x,y")
 	}
 
@@ -95,9 +124,6 @@ var LiteralExpression = ParseFunc(func(ex ExpressionContext, input string) (Enum
 })
 
 func parseStartValue(ex ExpressionContext, input string) (int, error) {
-	if input == "*" {
-		return ex.Min(), nil
-	}
 	start, err := strconv.Atoi(strings.TrimSpace(input))
 	if err != nil {
 		return 0, err
