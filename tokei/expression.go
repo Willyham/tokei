@@ -2,6 +2,7 @@ package tokei
 
 import (
 	"errors"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -16,7 +17,31 @@ type CronExpression struct {
 }
 
 func Parse(input string) (*CronExpression, error) {
-	return &CronExpression{}, nil
+	parts := strings.Split(input, " ")
+	if len(parts) < 6 {
+		return nil, errors.New("invalid expression")
+	}
+	min, minErr := multiExpression.Parse(MinuteContext, parts[0])
+	hour, hourErr := multiExpression.Parse(HourContext, parts[1])
+	dom, domErr := multiExpression.Parse(DayOfMonthContext, parts[2])
+	month, monthErr := multiExpression.Parse(MonthContext, parts[3])
+	dow, dowErr := multiExpression.Parse(DayOfWeekContext, parts[4])
+	command := strings.Join(parts[5:], " ")
+
+	for _, err := range []error{minErr, hourErr, domErr, monthErr, dowErr} {
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &CronExpression{
+		minutes:    min,
+		hours:      hour,
+		dayOfMonth: dom,
+		month:      month,
+		dayOfWeek:  dow,
+		command:    command,
+	}, nil
 }
 
 type Parser interface {
@@ -27,6 +52,35 @@ type ParseFunc func(ExpressionContext, string) (Enumerator, error)
 
 func (f ParseFunc) Parse(ex ExpressionContext, input string) (Enumerator, error) {
 	return f(ex, input)
+}
+
+type MultiExpression struct {
+	rangeRegex   *regexp.Regexp
+	repeatRegex  *regexp.Regexp
+	literalRegex *regexp.Regexp
+}
+
+func (m MultiExpression) Parse(ex ExpressionContext, input string) (Enumerator, error) {
+	trimmed := strings.TrimSpace(input)
+	if trimmed == "*" {
+		return KleeneExpression(ex, input)
+	}
+	if m.rangeRegex.MatchString(trimmed) {
+		return RangeExpression(ex, trimmed)
+	}
+	if m.repeatRegex.MatchString(trimmed) {
+		return RepeatExpression(ex, trimmed)
+	}
+	if m.literalRegex.MatchString(trimmed) {
+		return LiteralExpression(ex, trimmed)
+	}
+	return nil, errors.New("unknown expression")
+}
+
+var multiExpression = MultiExpression{
+	rangeRegex:   regexp.MustCompile(`\d-\d`),
+	repeatRegex:  regexp.MustCompile(`./\d`),
+	literalRegex: regexp.MustCompile(`(\d+)(,\s*\d+)*`),
 }
 
 var KleeneExpression = ParseFunc(func(ex ExpressionContext, input string) (Enumerator, error) {
@@ -102,10 +156,6 @@ var RepeatExpression = ParseFunc(func(ex ExpressionContext, input string) (Enume
 
 var LiteralExpression = ParseFunc(func(ex ExpressionContext, input string) (Enumerator, error) {
 	parts := strings.Split(input, ",")
-	if len(parts) < 2 {
-		return nil, errors.New("must be of form x,y")
-	}
-
 	times := make([]int, len(parts))
 	for i, part := range parts {
 		time, err := strconv.Atoi(strings.TrimSpace(part))

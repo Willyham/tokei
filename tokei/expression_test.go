@@ -136,3 +136,31 @@ func TestLiteralExpressionError(t *testing.T) {
 		})
 	}
 }
+
+func TestMultiExpression(t *testing.T) {
+	cases := []struct {
+		name     string
+		input    string
+		expected Enumerator
+	}{
+		{"star", "*", Sequence{start: 0, stop: 59, step: 1}},
+		{"range", "1-10", Sequence{start: 1, stop: 10, step: 1}},
+		{"range single", "25", IrregularSequence{entries: []int{25}}},
+		{"repeat", "5/10", Sequence{start: 5, stop: 59, step: 10}},
+		{"repeat star", "*/10", Sequence{start: 0, stop: 59, step: 10}},
+		{"literal", "1,2,3", IrregularSequence{entries: []int{1, 2, 3}}},
+	}
+
+	for _, test := range cases {
+		t.Run(test.name, func(t *testing.T) {
+			re, err := multiExpression.Parse(MinuteContext, test.input)
+			assert.NoError(t, err)
+			assert.Equal(t, test.expected, re)
+		})
+	}
+}
+
+func TestMultiError(t *testing.T) {
+	_, err := multiExpression.Parse(MinuteContext, "blah")
+	assert.Error(t, err)
+}
