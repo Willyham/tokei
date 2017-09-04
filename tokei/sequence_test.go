@@ -34,6 +34,7 @@ func TestSequenceEnumerate(t *testing.T) {
 }
 
 func TestIrregularSequence(t *testing.T) {
-	assert.Equal(t, NewIrregularSequence([]int{1, 3, 4, 10}).Enumerate(), []int{1, 3, 4, 10})
-	assert.Equal(t, NewIrregularSequence([]int{1, 10, 3, 4}).Enumerate(), []int{1, 3, 4, 10})
+	assert.Equal(t, []int{1, 3, 4, 10}, NewIrregularSequence([]int{1, 3, 4, 10}).Enumerate())
+	assert.Equal(t, []int{1, 3, 4, 10}, NewIrregularSequence([]int{1, 10, 3, 4}).Enumerate())
+	assert.Equal(t, []int{1, 2, 3}, NewIrregularSequence([]int{1, 1, 2, 2, 3, 3}).Enumerate())
 }

@@ -51,7 +51,19 @@ func NewIrregularSequence(entries []int) IrregularSequence {
 }
 
 // Enumerate returns the list of ints, in order.
+// It removes any duplicates.
 func (s IrregularSequence) Enumerate() []int {
-	sort.Ints(s.entries)
-	return s.entries
+	output := make([]int, 0, len(s.entries))
+	seen := map[int]struct{}{}
+	for _, num := range s.entries {
+		_, ok := seen[num]
+		if ok {
+			continue
+		}
+		output = append(output, num)
+		seen[num] = struct{}{}
+	}
+
+	sort.Ints(output)
+	return output
 }
