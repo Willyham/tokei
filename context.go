@@ -5,19 +5,19 @@ type expressionContext int
 
 // Types of ExpressionContext
 const (
-	MinuteContext expressionContext = iota
-	HourContext
-	DayOfMonthContext
-	MonthContext
-	DayOfWeekContext
+	minuteContext expressionContext = iota
+	hourContext
+	dayOfMonthContext
+	monthContext
+	dayOfWeekContext
 )
 
 // Min gets the min value for the context.
 func (ex expressionContext) Min() int {
 	switch ex {
-	case MinuteContext, HourContext:
+	case minuteContext, hourContext:
 		return 0
-	case DayOfWeekContext, MonthContext, DayOfMonthContext:
+	case dayOfWeekContext, monthContext, dayOfMonthContext:
 		return 1
 	default:
 		panic("invalid expression context")
@@ -27,15 +27,15 @@ func (ex expressionContext) Min() int {
 // Max gets the max value for the context.
 func (ex expressionContext) Max() int {
 	switch ex {
-	case MinuteContext:
+	case minuteContext:
 		return 59
-	case HourContext:
+	case hourContext:
 		return 23
-	case DayOfWeekContext:
+	case dayOfWeekContext:
 		return 7
-	case MonthContext:
+	case monthContext:
 		return 12
-	case DayOfMonthContext:
+	case dayOfMonthContext:
 		return 31
 	default:
 		panic("invalid expression context")

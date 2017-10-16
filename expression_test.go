@@ -7,13 +7,13 @@ import (
 )
 
 func TestKleeneExpression(t *testing.T) {
-	ex, err := kleeneExpression(DayOfWeekContext, "*")
+	ex, err := kleeneExpression(dayOfWeekContext, "*")
 	assert.NoError(t, err)
 	assert.Equal(t, sequence{start: 1, end: 7, step: 1}, ex)
 }
 
 func TestKleeneExpressionError(t *testing.T) {
-	_, err := kleeneExpression(MinuteContext, "5")
+	_, err := kleeneExpression(minuteContext, "5")
 	assert.Error(t, err)
 }
 
@@ -29,7 +29,7 @@ func TestRangeExpression(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			re, err := rangeExpression(MinuteContext, test.input)
+			re, err := rangeExpression(minuteContext, test.input)
 			assert.NoError(t, err)
 			assert.Equal(t, test.expected, re)
 		})
@@ -55,7 +55,7 @@ func TestRangeExpressionErrors(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			_, err := rangeExpression(MonthContext, test.input)
+			_, err := rangeExpression(monthContext, test.input)
 			assert.Error(t, err)
 		})
 	}
@@ -73,7 +73,7 @@ func TestRepeatExpression(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			re, err := repeatExpression(MinuteContext, test.input)
+			re, err := repeatExpression(minuteContext, test.input)
 			assert.NoError(t, err)
 			assert.Equal(t, test.expected, re)
 		})
@@ -94,7 +94,7 @@ func TestRepeatExpressionError(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			_, err := repeatExpression(MinuteContext, test.input)
+			_, err := repeatExpression(minuteContext, test.input)
 			assert.Error(t, err)
 		})
 	}
@@ -112,7 +112,7 @@ func TestLiteralExpression(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			re, err := literalExpression(MinuteContext, test.input)
+			re, err := literalExpression(minuteContext, test.input)
 			assert.NoError(t, err)
 			assert.Equal(t, test.expected, re)
 		})
@@ -134,7 +134,7 @@ func TestLiteralExpressionError(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			_, err := literalExpression(MinuteContext, test.input)
+			_, err := literalExpression(minuteContext, test.input)
 			assert.Error(t, err)
 		})
 	}
@@ -156,7 +156,7 @@ func TestMultiExpression(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			re, err := defaultMultiExpression.Parse(MinuteContext, test.input)
+			re, err := defaultMultiExpression.Parse(minuteContext, test.input)
 			assert.NoError(t, err)
 			assert.Equal(t, test.expected, re)
 		})
@@ -164,7 +164,7 @@ func TestMultiExpression(t *testing.T) {
 }
 
 func TestMultiError(t *testing.T) {
-	_, err := defaultMultiExpression.Parse(MinuteContext, "blah")
+	_, err := defaultMultiExpression.Parse(minuteContext, "blah")
 	assert.Error(t, err)
 }
 
