@@ -20,8 +20,11 @@ type CronExpression struct {
 // Parse parses a cron expression from a string.
 func Parse(input string) (*CronExpression, error) {
 	parts := strings.Split(input, " ")
-	if len(parts) < 6 {
+	if len(parts) < 5 {
 		return nil, errors.New("invalid expression")
+	}
+	if len(parts) == 5 {
+		parts = append(parts, "")
 	}
 	min, minErr := multiExpression.Parse(MinuteContext, parts[0])
 	hour, hourErr := multiExpression.Parse(HourContext, parts[1])
