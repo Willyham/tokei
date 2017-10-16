@@ -7,15 +7,21 @@ import (
 
 // Schedule represents the schedule on which the job will fire for a given timezone.
 type Schedule struct {
-	location   *time.Location
-	expression *CronExpression
+	location *time.Location
+
+	// Cache these ranges on creation to avoid allocations in Next()
+	month, dayOfMonth, dayOfWeek, hours, minutes []int
 }
 
 // NewSchedule creates a new schedule for an expression in the given timezone.
 func NewSchedule(location *time.Location, ex *CronExpression) *Schedule {
 	return &Schedule{
 		location:   location,
-		expression: ex,
+		month:      ex.month.Enumerate(),
+		dayOfMonth: ex.dayOfMonth.Enumerate(),
+		dayOfWeek:  ex.dayOfWeek.Enumerate(),
+		hours:      ex.hours.Enumerate(),
+		minutes:    ex.minutes.Enumerate(),
 	}
 }
 
@@ -95,11 +101,11 @@ func (s *Schedule) calculateNextFromTime(t time.Time, matchSame bool) time.Time 
 }
 
 func (s *Schedule) matchesMonth(month time.Month) bool {
-	return contains(s.expression.month.Enumerate(), int(month))
+	return contains(s.month, int(month))
 }
 
 func (s *Schedule) matchesDayOfMonth(dayOfMonth int) bool {
-	return contains(s.expression.dayOfMonth.Enumerate(), dayOfMonth)
+	return contains(s.dayOfMonth, dayOfMonth)
 }
 
 func (s *Schedule) matchesDayOfWeek(dayOfWeek time.Weekday) bool {
@@ -107,15 +113,15 @@ func (s *Schedule) matchesDayOfWeek(dayOfWeek time.Weekday) bool {
 	if weekday == 0 {
 		weekday = 7
 	}
-	return contains(s.expression.dayOfWeek.Enumerate(), weekday)
+	return contains(s.dayOfWeek, weekday)
 }
 
 func (s *Schedule) matchesHour(hour int) bool {
-	return contains(s.expression.hours.Enumerate(), hour)
+	return contains(s.hours, hour)
 }
 
 func (s *Schedule) matchesMinute(minute int) bool {
-	return contains(s.expression.minutes.Enumerate(), minute)
+	return contains(s.minutes, minute)
 }
 
 // ScheduleTimer is a timer which runs on the cron schedule.
