@@ -92,7 +92,7 @@ func (s *Schedule) calculateNextFromTime(t time.Time, matchSame bool) time.Time 
 		return current
 	}
 
-	// If we don't want to match the current time (maybe becasue we want to generate the next N times from now)
+	// If we don't want to match the current time (maybe because we want to generate the next N times from now)
 	// add a minute to move us along.
 	if matchSame {
 		return getNext(t)

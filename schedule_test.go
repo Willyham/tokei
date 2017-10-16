@@ -38,7 +38,7 @@ func TestNext(t *testing.T) {
 		{"wrap minute", "7 * * * *", epoch.Add(time.Hour*3 + time.Minute*10), epoch.Add(time.Hour*4 + time.Minute*7)},
 
 		// At every 5th minute from 10 through 59 past every hour from 3 through 5 on day-of-month 1 and 2 and on Tuesday in July.
-		// First occurance is Tuesday 2nd July 1974 03:10:00
+		// First occurrence is Tuesday 2nd July 1974 03:10:00
 		{"complex", "10/5 3-5 1,2 7 2", epoch, epoch.AddDate(4, 6, 1).Add(time.Hour*3 + time.Minute*10)},
 	}
 
