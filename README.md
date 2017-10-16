@@ -1,6 +1,6 @@
 [![GoDoc](http://godoc.org/github.com/Willyham/tokei?status.png)](http://godoc.org/github.com/Willyham/tokei)
 
-=== Usage
+## Usage
 
 Tokei is a simple and fast library for parsing and scheduling cron tasks. It can tell you when a cron will fire
 at any point in the future, or it can give you a timer which fires every time the cron does.
@@ -31,7 +31,7 @@ go func() {
 go timer.Start()
 ```
 
-==== Benchmarks
+### Benchmarks
 
 Tokei is pretty quick, not that speed should be an issue for the kinds of things can be used for. Nevertheless,
 no golang library will be considered as usable by the community without some arbitrary benchmarks showing how quick it is:
@@ -55,7 +55,7 @@ BenchmarkProject/waking_hours-4          	  200000	      6516 ns/op	     368 B/o
 BenchmarkProject/years_in_future-4       	   50000	     25097 ns/op	     560 B/op	      10 allocs/op
 ```
 
-==== Improvements
+### Improvements
 
 Tokei only currently supports standard cron entries rather than extended ones.
 
