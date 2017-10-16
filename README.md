@@ -1,4 +1,4 @@
-[![GoDoc](http://godoc.org/github.com/Willyham/tokei?status.png)](http://godoc.org/github.com/Willyham/tokei)
+[![GoDoc](http://godoc.org/github.com/Willyham/tokei?status.png)](http://godoc.org/github.com/Willyham/tokei) [![Go Report Card](https://goreportcard.com/badge/github.com/Willyham/tokei)](https://goreportcard.com/report/github.com/Willyham/tokei)
 
 ## Usage
 
