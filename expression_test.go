@@ -194,9 +194,3 @@ func TestParseInvalid(t *testing.T) {
 		})
 	}
 }
-
-func TestOptionalCommand(t *testing.T) {
-	ex, err := Parse("1 1 1 1 1")
-	assert.NoError(t, err)
-	assert.Equal(t, "", ex.command)
-}

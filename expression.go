@@ -19,7 +19,6 @@ type CronExpression struct {
 	dayOfMonth enumerator
 	month      enumerator
 	dayOfWeek  enumerator
-	command    string
 }
 
 // Parse parses a cron expression from a string.
@@ -28,15 +27,11 @@ func Parse(input string) (*CronExpression, error) {
 	if len(parts) < 5 {
 		return nil, errors.New("invalid expression")
 	}
-	if len(parts) == 5 {
-		parts = append(parts, "")
-	}
 	min, minErr := defaultMultiExpression.Parse(minuteContext, parts[0])
 	hour, hourErr := defaultMultiExpression.Parse(hourContext, parts[1])
 	dom, domErr := defaultMultiExpression.Parse(dayOfMonthContext, parts[2])
 	month, monthErr := defaultMultiExpression.Parse(monthContext, parts[3])
 	dow, dowErr := defaultMultiExpression.Parse(dayOfWeekContext, parts[4])
-	command := strings.Join(parts[5:], " ")
 
 	for _, err := range []error{minErr, hourErr, domErr, monthErr, dowErr} {
 		if err != nil {
@@ -50,7 +45,6 @@ func Parse(input string) (*CronExpression, error) {
 		dayOfMonth: dom,
 		month:      month,
 		dayOfWeek:  dow,
-		command:    command,
 	}, nil
 }
 

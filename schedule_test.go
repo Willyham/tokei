@@ -17,29 +17,29 @@ func TestNext(t *testing.T) {
 		startTime time.Time
 		expected  time.Time
 	}{
-		{"every minute", "* * * * * /bin/foo", epoch, epoch},
-		{"minute 5", "5 * * * * /bin/foo", epoch, epoch.Add(time.Minute * 5)},
-		{"hour 5", "* 5 * * * /bin/foo", epoch, epoch.Add(time.Hour * 5)},
-		{"day of month 5", "* * 5 * * /bin/foo", epoch, epoch.AddDate(0, 0, 4)},
-		{"day of week 5", "* * * * 5 /bin/foo", epoch, epoch.AddDate(0, 0, 1)}, // Epoch was a Thursday
-		{"month 5", "* * * 5 * /bin/foo", epoch, epoch.AddDate(0, 4, 0)},
+		{"every minute", "* * * * *", epoch, epoch},
+		{"minute 5", "5 * * * *", epoch, epoch.Add(time.Minute * 5)},
+		{"hour 5", "* 5 * * *", epoch, epoch.Add(time.Hour * 5)},
+		{"day of month 5", "* * 5 * *", epoch, epoch.AddDate(0, 0, 4)},
+		{"day of week 5", "* * * * 5", epoch, epoch.AddDate(0, 0, 1)}, // Epoch was a Thursday
+		{"month 5", "* * * 5 *", epoch, epoch.AddDate(0, 4, 0)},
 
 		// Tuesday in Jan which is the 2nd of the month. This is before the epoch (end of 1969) and doesn't occur again
 		// until 1973
-		{"wrap year", "* * 2 1 2 /bin/foo", epoch, epoch.AddDate(3, 0, 1)},
+		{"wrap year", "* * 2 1 2", epoch, epoch.AddDate(3, 0, 1)},
 
 		// Start at day 10 and ask for any 7th of the month. Should get Feb 7th.
-		{"wrap months", "* * 7 * * /bin/foo", epoch.AddDate(0, 0, 10), epoch.AddDate(0, 1, 6)},
+		{"wrap months", "* * 7 * *", epoch.AddDate(0, 0, 10), epoch.AddDate(0, 1, 6)},
 
 		// Start at hour 10 on 1st and ask for any hour 7. Should get 07:00 Jan 2nd.
-		{"wrap hours", "* 7 * * * /bin/foo", epoch.Add(time.Hour * 10), epoch.AddDate(0, 0, 1).Add(time.Hour * 7)},
+		{"wrap hours", "* 7 * * *", epoch.Add(time.Hour * 10), epoch.AddDate(0, 0, 1).Add(time.Hour * 7)},
 
 		// Start at minute 10 in hour 3 and ask for any mminute 7. Should get 04:07 Jan 1st.
-		{"wrap minute", "7 * * * * /bin/foo", epoch.Add(time.Hour*3 + time.Minute*10), epoch.Add(time.Hour*4 + time.Minute*7)},
+		{"wrap minute", "7 * * * *", epoch.Add(time.Hour*3 + time.Minute*10), epoch.Add(time.Hour*4 + time.Minute*7)},
 
 		// At every 5th minute from 10 through 59 past every hour from 3 through 5 on day-of-month 1 and 2 and on Tuesday in July.
 		// First occurance is Tuesday 2nd July 1974 03:10:00
-		{"complex", "10/5 3-5 1,2 7 2 /bin/foo", epoch, epoch.AddDate(4, 6, 1).Add(time.Hour*3 + time.Minute*10)},
+		{"complex", "10/5 3-5 1,2 7 2", epoch, epoch.AddDate(4, 6, 1).Add(time.Hour*3 + time.Minute*10)},
 	}
 
 	for _, test := range cases {
@@ -55,7 +55,7 @@ func TestNext(t *testing.T) {
 }
 
 func TestNextMultiple(t *testing.T) {
-	ex, err := Parse("* * * * * foo")
+	ex, err := Parse("* * * * *")
 	require.NoError(t, err)
 
 	sched := NewScheduleUTC(ex)
@@ -66,7 +66,7 @@ func TestNextMultiple(t *testing.T) {
 }
 
 func TestTimer(t *testing.T) {
-	ex, err := Parse("* * * * * foo")
+	ex, err := Parse("* * * * *")
 	require.NoError(t, err)
 	schedule := NewScheduleUTC(ex)
 
@@ -84,7 +84,7 @@ func TestTimerLong(t *testing.T) {
 		t.SkipNow()
 		return
 	}
-	ex, err := Parse("*/2 * * * * foo")
+	ex, err := Parse("*/2 * * * *")
 	require.NoError(t, err)
 	schedule := NewScheduleUTC(ex)
 
