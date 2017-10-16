@@ -5,24 +5,24 @@ import (
 	"sort"
 )
 
-// Enumerator is anything which can enumerate a list of ints.
-type Enumerator interface {
+// enumerator is anything which can enumerate a list of ints.
+type enumerator interface {
 	Enumerate() []int
 }
 
-// Sequence describes a sequence of ints which can be enumerated.
-type Sequence struct {
+// sequence describes a sequence of ints which can be enumerated.
+type sequence struct {
 	start int
 	end   int
 	step  int
 }
 
-// NewSequence creates a new sequence.
-func NewSequence(start, end, step int) (*Sequence, error) {
+// newSequence creates a new sequence.
+func newSequence(start, end, step int) (*sequence, error) {
 	if step < 0 || end < start {
 		return nil, errors.New("invalid sequence")
 	}
-	return &Sequence{
+	return &sequence{
 		start: start,
 		end:   end,
 		step:  step,
@@ -30,7 +30,7 @@ func NewSequence(start, end, step int) (*Sequence, error) {
 }
 
 // Enumerate returns a list of all ints in this sequence.
-func (s Sequence) Enumerate() []int {
+func (s sequence) Enumerate() []int {
 	output := make([]int, 0)
 	for i := s.start; i <= s.end; i += s.step {
 		output = append(output, i)
@@ -38,21 +38,21 @@ func (s Sequence) Enumerate() []int {
 	return output
 }
 
-// IrregularSequence is a sequence which doesn't follow a regular pattern.
-type IrregularSequence struct {
+// irregularSequence is a sequence which doesn't follow a regular pattern.
+type irregularSequence struct {
 	entries []int
 }
 
-// NewIrregularSequence creates a sequence from a list of ints.
-func NewIrregularSequence(entries []int) IrregularSequence {
-	return IrregularSequence{
+// newIrregularSequence creates a sequence from a list of ints.
+func newIrregularSequence(entries []int) irregularSequence {
+	return irregularSequence{
 		entries: entries,
 	}
 }
 
 // Enumerate returns the list of ints, in order.
 // It removes any duplicates.
-func (s IrregularSequence) Enumerate() []int {
+func (s irregularSequence) Enumerate() []int {
 	output := make([]int, 0, len(s.entries))
 	seen := map[int]struct{}{}
 	for _, num := range s.entries {

@@ -1,11 +1,11 @@
 package tokei
 
-// ExpressionContext defines the type of expression we're parsing.
-type ExpressionContext int
+// expressionContext defines the type of expression we're parsing.
+type expressionContext int
 
 // Types of ExpressionContext
 const (
-	MinuteContext ExpressionContext = iota
+	MinuteContext expressionContext = iota
 	HourContext
 	DayOfMonthContext
 	MonthContext
@@ -13,7 +13,7 @@ const (
 )
 
 // Min gets the min value for the context.
-func (ex ExpressionContext) Min() int {
+func (ex expressionContext) Min() int {
 	switch ex {
 	case MinuteContext, HourContext:
 		return 0
@@ -25,7 +25,7 @@ func (ex ExpressionContext) Min() int {
 }
 
 // Max gets the max value for the context.
-func (ex ExpressionContext) Max() int {
+func (ex expressionContext) Max() int {
 	switch ex {
 	case MinuteContext:
 		return 59

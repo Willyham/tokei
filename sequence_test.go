@@ -22,7 +22,7 @@ func TestSequenceEnumerate(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			seq, err := NewSequence(test.start, test.end, test.step)
+			seq, err := newSequence(test.start, test.end, test.step)
 			if test.errExpected {
 				assert.Error(t, err)
 				assert.Nil(t, seq)
@@ -34,7 +34,7 @@ func TestSequenceEnumerate(t *testing.T) {
 }
 
 func TestIrregularSequence(t *testing.T) {
-	assert.Equal(t, []int{1, 3, 4, 10}, NewIrregularSequence([]int{1, 3, 4, 10}).Enumerate())
-	assert.Equal(t, []int{1, 3, 4, 10}, NewIrregularSequence([]int{1, 10, 3, 4}).Enumerate())
-	assert.Equal(t, []int{1, 2, 3}, NewIrregularSequence([]int{1, 1, 2, 2, 3, 3}).Enumerate())
+	assert.Equal(t, []int{1, 3, 4, 10}, newIrregularSequence([]int{1, 3, 4, 10}).Enumerate())
+	assert.Equal(t, []int{1, 3, 4, 10}, newIrregularSequence([]int{1, 10, 3, 4}).Enumerate())
+	assert.Equal(t, []int{1, 2, 3}, newIrregularSequence([]int{1, 1, 2, 2, 3, 3}).Enumerate())
 }

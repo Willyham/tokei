@@ -7,13 +7,13 @@ import (
 )
 
 func TestKleeneExpression(t *testing.T) {
-	ex, err := KleeneExpression(DayOfWeekContext, "*")
+	ex, err := kleeneExpression(DayOfWeekContext, "*")
 	assert.NoError(t, err)
-	assert.Equal(t, Sequence{start: 1, end: 7, step: 1}, ex)
+	assert.Equal(t, sequence{start: 1, end: 7, step: 1}, ex)
 }
 
 func TestKleeneExpressionError(t *testing.T) {
-	_, err := KleeneExpression(MinuteContext, "5")
+	_, err := kleeneExpression(MinuteContext, "5")
 	assert.Error(t, err)
 }
 
@@ -21,15 +21,15 @@ func TestRangeExpression(t *testing.T) {
 	cases := []struct {
 		name     string
 		input    string
-		expected Enumerator
+		expected enumerator
 	}{
-		{"normal", "1-10", Sequence{start: 1, end: 10, step: 1}},
-		{"single", "25", IrregularSequence{entries: []int{25}}},
+		{"normal", "1-10", sequence{start: 1, end: 10, step: 1}},
+		{"single", "25", irregularSequence{entries: []int{25}}},
 	}
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			re, err := RangeExpression(MinuteContext, test.input)
+			re, err := rangeExpression(MinuteContext, test.input)
 			assert.NoError(t, err)
 			assert.Equal(t, test.expected, re)
 		})
@@ -55,7 +55,7 @@ func TestRangeExpressionErrors(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			_, err := RangeExpression(MonthContext, test.input)
+			_, err := rangeExpression(MonthContext, test.input)
 			assert.Error(t, err)
 		})
 	}
@@ -65,15 +65,15 @@ func TestRepeatExpression(t *testing.T) {
 	cases := []struct {
 		name     string
 		input    string
-		expected Enumerator
+		expected enumerator
 	}{
-		{"star", "*/10", Sequence{start: 0, end: 59, step: 10}},
-		{"normal", "5/10", Sequence{start: 5, end: 59, step: 10}},
+		{"star", "*/10", sequence{start: 0, end: 59, step: 10}},
+		{"normal", "5/10", sequence{start: 5, end: 59, step: 10}},
 	}
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			re, err := RepeatExpression(MinuteContext, test.input)
+			re, err := repeatExpression(MinuteContext, test.input)
 			assert.NoError(t, err)
 			assert.Equal(t, test.expected, re)
 		})
@@ -94,7 +94,7 @@ func TestRepeatExpressionError(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			_, err := RepeatExpression(MinuteContext, test.input)
+			_, err := repeatExpression(MinuteContext, test.input)
 			assert.Error(t, err)
 		})
 	}
@@ -104,15 +104,15 @@ func TestLiteralExpression(t *testing.T) {
 	cases := []struct {
 		name     string
 		input    string
-		expected Enumerator
+		expected enumerator
 	}{
-		{"single", "1,2,3", IrregularSequence{entries: []int{1, 2, 3}}},
-		{"normal", "1,2,3", IrregularSequence{entries: []int{1, 2, 3}}},
+		{"single", "1,2,3", irregularSequence{entries: []int{1, 2, 3}}},
+		{"normal", "1,2,3", irregularSequence{entries: []int{1, 2, 3}}},
 	}
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			re, err := LiteralExpression(MinuteContext, test.input)
+			re, err := literalExpression(MinuteContext, test.input)
 			assert.NoError(t, err)
 			assert.Equal(t, test.expected, re)
 		})
@@ -134,7 +134,7 @@ func TestLiteralExpressionError(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			_, err := LiteralExpression(MinuteContext, test.input)
+			_, err := literalExpression(MinuteContext, test.input)
 			assert.Error(t, err)
 		})
 	}
@@ -144,19 +144,19 @@ func TestMultiExpression(t *testing.T) {
 	cases := []struct {
 		name     string
 		input    string
-		expected Enumerator
+		expected enumerator
 	}{
-		{"star", "*", Sequence{start: 0, end: 59, step: 1}},
-		{"range", "1-10", Sequence{start: 1, end: 10, step: 1}},
-		{"range single", "25", IrregularSequence{entries: []int{25}}},
-		{"repeat", "5/10", Sequence{start: 5, end: 59, step: 10}},
-		{"repeat star", "*/10", Sequence{start: 0, end: 59, step: 10}},
-		{"literal", "1,2,3", IrregularSequence{entries: []int{1, 2, 3}}},
+		{"star", "*", sequence{start: 0, end: 59, step: 1}},
+		{"range", "1-10", sequence{start: 1, end: 10, step: 1}},
+		{"range single", "25", irregularSequence{entries: []int{25}}},
+		{"repeat", "5/10", sequence{start: 5, end: 59, step: 10}},
+		{"repeat star", "*/10", sequence{start: 0, end: 59, step: 10}},
+		{"literal", "1,2,3", irregularSequence{entries: []int{1, 2, 3}}},
 	}
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			re, err := multiExpression.Parse(MinuteContext, test.input)
+			re, err := defaultMultiExpression.Parse(MinuteContext, test.input)
 			assert.NoError(t, err)
 			assert.Equal(t, test.expected, re)
 		})
@@ -164,12 +164,12 @@ func TestMultiExpression(t *testing.T) {
 }
 
 func TestMultiError(t *testing.T) {
-	_, err := multiExpression.Parse(MinuteContext, "blah")
+	_, err := defaultMultiExpression.Parse(MinuteContext, "blah")
 	assert.Error(t, err)
 }
 
 func TestContextInvalid(t *testing.T) {
-	invalid := ExpressionContext(1000)
+	invalid := expressionContext(1000)
 	assert.Panics(t, func() {
 		invalid.Min()
 	})
@@ -198,5 +198,5 @@ func TestParseInvalid(t *testing.T) {
 func TestOptionalCommand(t *testing.T) {
 	ex, err := Parse("1 1 1 1 1")
 	assert.NoError(t, err)
-	assert.Equal(t, "", ex.Command)
+	assert.Equal(t, "", ex.command)
 }

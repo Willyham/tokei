@@ -95,11 +95,11 @@ func (s *Schedule) calculateNextFromTime(t time.Time, matchSame bool) time.Time 
 }
 
 func (s *Schedule) matchesMonth(month time.Month) bool {
-	return contains(s.expression.Month.Enumerate(), int(month))
+	return contains(s.expression.month.Enumerate(), int(month))
 }
 
 func (s *Schedule) matchesDayOfMonth(dayOfMonth int) bool {
-	return contains(s.expression.DayOfMonth.Enumerate(), dayOfMonth)
+	return contains(s.expression.dayOfMonth.Enumerate(), dayOfMonth)
 }
 
 func (s *Schedule) matchesDayOfWeek(dayOfWeek time.Weekday) bool {
@@ -107,15 +107,15 @@ func (s *Schedule) matchesDayOfWeek(dayOfWeek time.Weekday) bool {
 	if weekday == 0 {
 		weekday = 7
 	}
-	return contains(s.expression.DayOfWeek.Enumerate(), weekday)
+	return contains(s.expression.dayOfWeek.Enumerate(), weekday)
 }
 
 func (s *Schedule) matchesHour(hour int) bool {
-	return contains(s.expression.Hours.Enumerate(), hour)
+	return contains(s.expression.hours.Enumerate(), hour)
 }
 
 func (s *Schedule) matchesMinute(minute int) bool {
-	return contains(s.expression.Minutes.Enumerate(), minute)
+	return contains(s.expression.minutes.Enumerate(), minute)
 }
 
 // ScheduleTimer is a timer which runs on the cron schedule.
