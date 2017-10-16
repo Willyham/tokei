@@ -97,22 +97,41 @@ func TestTimerLong(t *testing.T) {
 	assert.WithinDuration(t, startTime, out, time.Minute+time.Second)
 }
 
-func BenchmarkNext(b *testing.B) {
-	cases := []struct {
-		name  string
-		input string
-	}{
-		{"now", "* * * * *"},
-	}
+var benchCases = []struct {
+	name  string
+	input string
+}{
+	{"all", "* * * * *"},
+	{"every 10 minutes", "*/10 * * * *"},
+	{"waking hours", "00 09-18 * * 1-5"},
+	{"years in future", "10/5 3-5 1,2 7 2"},
+}
 
-	for _, bench := range cases {
+func BenchmarkNext(b *testing.B) {
+	for _, bench := range benchCases {
 		ex, err := Parse(bench.input)
 		require.NoError(b, err)
 		sched := NewScheduleUTC(ex)
 
+		epoch := time.Unix(0, 0).In(time.UTC)
 		b.Run(bench.name, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				sched.Next()
+				sched.NextFrom(epoch)
+			}
+		})
+	}
+}
+
+func BenchmarkProject(b *testing.B) {
+	for _, bench := range benchCases {
+		ex, err := Parse(bench.input)
+		require.NoError(b, err)
+		sched := NewScheduleUTC(ex)
+
+		epoch := time.Unix(0, 0).In(time.UTC)
+		b.Run(bench.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				sched.ProjectFrom(epoch, 5)
 			}
 		})
 	}
