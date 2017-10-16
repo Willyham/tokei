@@ -48,11 +48,14 @@ func TestRangeExpressionErrors(t *testing.T) {
 		{"bad start", "a-10"},
 		{"bad end", "10-a"},
 		{"junk", "asdfghjkl"},
+		{"low start", "0-10"},
+		{"high end", "10-13"},
+		{"high both", "13-14"},
 	}
 
 	for _, test := range cases {
 		t.Run(test.name, func(t *testing.T) {
-			_, err := RangeExpression(MinuteContext, test.input)
+			_, err := RangeExpression(MonthContext, test.input)
 			assert.Error(t, err)
 		})
 	}
@@ -163,4 +166,37 @@ func TestMultiExpression(t *testing.T) {
 func TestMultiError(t *testing.T) {
 	_, err := multiExpression.Parse(MinuteContext, "blah")
 	assert.Error(t, err)
+}
+
+func TestContextInvalid(t *testing.T) {
+	invalid := ExpressionContext(1000)
+	assert.Panics(t, func() {
+		invalid.Min()
+	})
+	assert.Panics(t, func() {
+		invalid.Max()
+	})
+}
+
+func TestParseInvalid(t *testing.T) {
+	cases := []struct {
+		name  string
+		input string
+	}{
+		{"empty", ""},
+		{"not enough parts", "1 1 1 1"},
+		{"bad part", "a 1 1 1 1"},
+	}
+	for _, test := range cases {
+		t.Run(test.name, func(t *testing.T) {
+			_, err := Parse(test.input)
+			assert.Error(t, err)
+		})
+	}
+}
+
+func TestOptionalCommand(t *testing.T) {
+	ex, err := Parse("1 1 1 1 1")
+	assert.NoError(t, err)
+	assert.Equal(t, "", ex.Command)
 }

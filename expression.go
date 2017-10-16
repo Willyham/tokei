@@ -1,3 +1,8 @@
+// Package tokei provides a cron parser and scheduler.
+//
+// Tokei works by parsing the cron string and generating an Enumerator for each
+// part of the expression. It these uses these Enumerators to enumerate possible valid
+// combinations of times which match the expression.
 package tokei
 
 import (
@@ -9,12 +14,12 @@ import (
 
 // CronExpression describes a parsed cron expression.
 type CronExpression struct {
-	minutes    Enumerator
-	hours      Enumerator
-	dayOfMonth Enumerator
-	month      Enumerator
-	dayOfWeek  Enumerator
-	command    string
+	Minutes    Enumerator
+	Hours      Enumerator
+	DayOfMonth Enumerator
+	Month      Enumerator
+	DayOfWeek  Enumerator
+	Command    string
 }
 
 // Parse parses a cron expression from a string.
@@ -40,12 +45,12 @@ func Parse(input string) (*CronExpression, error) {
 	}
 
 	return &CronExpression{
-		minutes:    min,
-		hours:      hour,
-		dayOfMonth: dom,
-		month:      month,
-		dayOfWeek:  dow,
-		command:    command,
+		Minutes:    min,
+		Hours:      hour,
+		DayOfMonth: dom,
+		Month:      month,
+		DayOfWeek:  dow,
+		Command:    command,
 	}, nil
 }
 
