@@ -33,10 +33,10 @@ go timer.Start()
 
 ### Benchmarks
 
-Tokei is pretty quick, not that speed should be an issue for the kinds of things can be used for. Nevertheless,
-no golang library will be considered as usable by the community without some arbitrary benchmarks showing how quick it is:
+Tokei is pretty quick, not that speed should be an issue for the kinds of things it can be used for. Nevertheless,
+no golang library will be considered usable by the community without some arbitrary benchmarks showing how quick it is.
 
-Generating the next firing time for some common cases. "years in future" is 'worst' case scenario where the first matching
+These benchmarks are generating the next firing time for some common cases; "years in future" is 'worst' case scenario where the first matching
 entry doesn't occur until about 4 years from the start time.
 
 ```
